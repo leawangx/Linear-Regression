@@ -1,0 +1,121 @@
+---
+title: "MGEC11 Assignment 2"
+author: "Xinrui Wang,1004741078"
+date: "2021/6/24"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Q1 
+a) yi = 3 + 5 × xi + epsilon_i  where xi is U(0, 5)
+
+```{r}
+sim_1 = function(sample_size = 30) {
+  x = runif(n=sample_size)*5
+  y = 3 + 5 * x + rnorm(n = sample_size, mean = 0, sd = sqrt(2))
+  data.frame(x, y)
+}
+
+set.seed(42)
+sim_data_1 = sim_1()
+head(sim_data_1)
+
+plot(y ~ x, data = sim_data_1, col = "grey", pch = 20,
+     main = "LR Model: yi = 3 + 5 × xi + e_i, n=30")
+fit_1 = lm(y ~ x, data = sim_data_1)
+abline(fit_1, col = "darkorange", lwd = 3)
+```
+b)sim for n=100,150,500
+```{r}
+sim_2 = function(sample_size = 100) {
+  x = runif(n=sample_size)*5
+  y = 3 + 5 * x + rnorm(n = sample_size, mean = 0, sd = sqrt(2))
+  data.frame(x, y)
+}
+
+set.seed(42)
+sim_data_2 = sim_2()
+head(sim_data_2)
+
+plot(y ~ x, data = sim_data_2, col = "grey", pch = 20,
+     main = "LR Model: yi = 3 + 5 × xi + e_i, n=100")
+fit_2 = lm(y ~ x, data = sim_data_2)
+abline(fit_2, col = "darkorange", lwd = 3)
+```
+
+```{r}
+sim_3 = function(sample_size = 150) {
+  x = runif(n=sample_size)*5
+  y = 3 + 5 * x + rnorm(n = sample_size, mean = 0, sd = sqrt(2))
+  data.frame(x, y)
+}
+
+set.seed(42)
+sim_data_3 = sim_3()
+head(sim_data_3)
+
+plot(y ~ x, data = sim_data_3, col = "grey", pch = 20,
+     main = "LR Model: yi = 3 + 5 × xi + e_i, n=150")
+fit_3 = lm(y ~ x, data = sim_data_3)
+abline(fit_3, col = "darkorange", lwd = 3)
+```
+
+```{r}
+sim_4 = function(sample_size = 500) {
+  x = runif(n=sample_size)*5
+  y = 3 + 5 * x + rnorm(n = sample_size, mean = 0, sd = sqrt(2))
+  data.frame(x, y)
+}
+
+set.seed(42)
+sim_data_4 = sim_4()
+head(sim_data_4)
+
+plot(y ~ x, data = sim_data_4, col = "grey", pch = 20,
+     main = "LR Model: yi = 3 + 5 × xi + e_i, n=500")
+fit_4 = lm(y ~ x, data = sim_data_4)
+abline(fit_4, col = "darkorange", lwd = 3)
+```
+
+
+get coef:
+```{r}
+coef(fit_1)
+coef(fit_2)
+coef(fit_3)
+coef(fit_4)
+```
+The true value is intercept = 3 and slope = 5. From the results, as sample size n increases, the estimated slope becomes more accurate, ie. it is closer and closer to the true slope 5.
+
+
+## Q2
+
+```{r}
+data<-read.csv("C:/Users/69544/Desktop/MGEC11/A2/data1.csv", header = T)
+model<-lm(y~cbind(x1,x2),data = data)
+par(mfrow = c(2, 2))
+plot(model)
+```
+From the residuals vs fitted figure, we don't have a horizontal line, the linearity is violated. also, we can see there is a pattern in the residuals, they first increase and then decrease. Thus, the model is not fit because the residuals do not distribute evenly. 
+Considering the normal Q-Q plot, we get heavy tails and residuals points don't follow the line very well, so normality is violated. 
+Since the residuals moves from far to close to the linear model and move from close to far, we guess the model should be y=√x  or y=lnx whose derivative becomes smaller when x becomes larger.
+Therefore, the model seems not appropriate.
+
+
+```{r}
+model2<- lm(y~log10(x1)+log10(x2),data=data)
+par(mfrow = c(2, 2))
+plot(model2)
+summary(model)
+```
+```{r}
+library(lmtest)
+bptest(model)
+bptest(model2)
+```
+we see a large p-value, so we do not reject the null of homoscedasticity.

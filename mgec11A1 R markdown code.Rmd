@@ -1,0 +1,123 @@
+---
+title: "A1"
+author: "Xinrui Wang"
+date: "2021/5/25"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r qn1}
+load("C:/Users/69544/Desktop/MGEC11/A1/interarrival.Rdata")
+#a)
+mean(interarrival)
+#b)
+P=ecdf(interarrival)
+P(1)
+#c)
+hist(interarrival,breaks=15)
+#d)
+cat("exponential distribution")
+#e)
+
+```
+
+```{r qn2}
+A=matrix(c(1,5,2,3,-2,2,-1,-1,-3,9,-1,1),nrow = 4, ncol = 3, byrow = TRUE)
+b=c(2,1,-1)
+#a) 
+A%*%b
+#b)
+t(b)%*%b
+#c)
+b%*%t(b)
+#d)
+C=t(A)%*%A
+C
+#e)
+#tr(C)
+sum(diag(C))
+#f)
+t(C)
+
+```
+
+```{r qn3}
+## Data prep ##
+nfl.raw <- read.csv("C:\\Users\\69544\\Desktop\\MGEC11\\A1\\NFLdraft.csv", head= T, strip.white= T , stringsAsFactors = F)
+# head(nfl.raw)
+# tail(nfl.raw)
+# str(nfl.raw)
+
+nfl.raw$Pos[nfl.raw$Pos == "LS"] <- "C"
+
+nfl <- within(nfl.raw, {
+  Pos <- factor(Pos)
+  PosGroup <- factor(ifelse(Pos %in% c("C", "DE", "DT", "OG", "OT", "TE"), "Linemen", 
+                     ifelse(Pos %in% c("CB", "WR", "FS"), "Small Backs", "Big Backs")))
+  
+  ProTeam <- factor(matrix(unlist(strsplit(Drafted, " / ")), ncol= 4, byrow = T)[,1])
+  Round   <- factor(matrix(unlist(strsplit(Drafted, " / ")), ncol= 4, byrow = T)[,2])
+  Overall <- factor(matrix(unlist(strsplit(Drafted, " / ")), ncol= 4, byrow = T)[,3])
+  Year    <- factor(matrix(unlist(strsplit(Drafted, " / ")), ncol= 4, byrow = T)[,4])
+  
+  Overall <- as.numeric(gsub("[^0-9]", "", Overall))
+  
+  HtFt <- as.numeric(sub("-.*", "", Ht))
+  HtIn <- as.numeric(sub("*.-", "", Ht))
+  Ht   <- 12*HtFt + HtIn
+})
+nfl <- subset(nfl, select= -c(Link, Drafted, Year, HtFt, HtIn)) # Remove unused columns
+# head(nfl) # Check
+# str(nfl)
+
+#Q3
+#a) Cleveland Browns 11
+TeamCounts<- table(nfl$ProTeam)
+TeamCounts
+sort(TeamCounts, decreasing = TRUE)
+#nfl$ProTeam[order(-TeamCounts)]
+#max(TeamCounts)
+
+#b)
+PosCounts <- table(nfl$Pos)
+PosCounts
+barplot(sort(PosCounts, decreasing = TRUE), main = "Draft Picks by player position")
+
+#c)
+fivenum(nfl$Ht)
+mean(nfl$Ht)
+
+#d)
+hist(nfl$Ht,main = "Heights of players", xlab = "Height")
+
+#e)
+plot(nfl$Wt, nfl$Yd40, ylab = "player’s 40-yd dash time", xlab = "player’s Weight")
+mod <- lm(nfl$Yd40 ~ nfl$Wt)
+summary(mod)
+abline(mod)
+# the relationship of Y&X looks linear (see the abline) 
+# outliers seem homoscedasticity
+
+#f)
+plot(nfl$Shuttle, nfl$Cone3, xlab = "shuttle drill time", ylab = "3-Cone drill time")
+mod2 <- lm(nfl$Cone3 ~ nfl$Shuttle)
+summary(mod2)
+abline(mod2)
+#plot(mod2) #yes looks like there is a linear association
+
+#Section 3
+cat("3-Cone drill=0.95098+1.45303*shuttle drill")
+cat("slope:for every additional shuttle drill time, 3-cone drill time increases 1; intercept: when shuttle is zero, 3-cone is 0.4004")
+cat("the relationship is statistically significant because p-value<0.05")
+
+#g) color
+
+
+
+
+```
