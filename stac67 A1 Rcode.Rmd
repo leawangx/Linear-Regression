@@ -1,0 +1,225 @@
+---
+title: "A1 R Markdown"
+author: "Xinrui Wang 1004741078, Hanjun Ge 1005719741"
+date: "2021/9/15"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Question 1
+
+### Part A
+
+The theoretical sampling distribution of $\overline{y}$ is normal distribution, $\overline{y} \sim \text{Normal}(\mu = 60, \sigma = 2)$.\
+The theoretical sampling distribution of $X^{2}$ is Chi-square distribution with $df = 25 - 1 = 24$.\
+The theoretical sampling distribution of $t$ is normal distribution, $\overline{y} \sim \text{Normal}(\mu = 0, \sigma = 1)$.\
+
+### Part B
+
+```{r}
+
+set.seed(1005719741)
+n = 25
+mu = 60
+sigma = 10
+yba_list = list()
+s_list = list()
+x2_list = list()
+t_list = list()
+
+
+for (i in 1:10000) {
+  sample = rnorm(n = 25, mean = 60, sd = 10)
+  yba_list[i] = mean(sample)
+  s_list[i] = sd(sample)
+  x2_list[i] = (n-1) * var(sample) / (sigma^2)
+  t_list[i] = (mean(sample) - mu) / (sd(sample) / sqrt(n))
+}
+
+
+hist(as.numeric(yba_list),
+     main = "Yba Histogram",
+     xlab = "Yba",
+     breaks = 15
+)
+
+plot(density(as.numeric(yba_list)), main = "Yba Histogram Theoretical Density", col = "red")
+
+hist(as.numeric(x2_list),
+     main = "X2 Histogram",
+     xlab = "X2",
+     breaks = 15
+)
+
+plot(density(as.numeric(x2_list)), main = "X2 Histogram Theoretical Density", col = "red")
+
+hist(as.numeric(t_list),
+     main = "t Histogram",
+     xlab = "t",
+     breaks = 15
+)
+
+plot(density(as.numeric(t_list)), main = "t Histogram Theoretical Density", col = "red")
+
+```
+
+### Part C
+
+```{r}
+
+yba_list_mean = mean(as.numeric(yba_list))
+yba_list_sd = sd(as.numeric(yba_list))
+yba_list_percentile = quantile(as.numeric(yba_list),c(0.025,0.25,0.50,0.75,0.975))
+
+x2_list_mean = mean(as.numeric(x2_list))
+x2_list_sd = sd(as.numeric(x2_list))
+x2_list_percentile = quantile(as.numeric(x2_list),c(0.025,0.25,0.50,0.75,0.975))
+     
+t_list_mean = mean(as.numeric(t_list))
+t_list_sd = sd(as.numeric(t_list))
+t_list_percentile = quantile(as.numeric(t_list),c(0.025,0.25,0.50,0.75,0.975))
+
+yba_list_mean
+yba_list_sd
+yba_list_percentile
+
+x2_list_mean
+x2_list_sd
+x2_list_percentile
+
+t_list_mean
+t_list_sd
+t_list_percentile
+
+```
+
+Comment: R output is very close to the theoretical values stated in part a. For $\overline{y}$, 60.00261 and 2.008066 are close to 60 and 2. For $t$, 0.0006309305 and 1.050759 are close to 0 and 1. $X^{2}$ distribution here is very close to a normal distribution since the degree of freedom 24 is large.
+
+## Question 2
+
+### Part A
+
+``` {r}
+
+NHLhtwt = read.csv("NHLhtwt.csv", header = TRUE)
+
+plot(NHLhtwt$Height, NHLhtwt$Weight, xlab = "Height, in inches", ylab = "Weight, in pounds")
+
+```
+
+Comment: We can see from the scatter plot that weight and height has a positive correlation.
+
+### Part B
+``` {r}
+
+model = lm(Weight ~ Height, data = NHLhtwt)
+
+summary(model)
+
+```
+
+
+### Part C
+
+The regression coefficient test $H_0$: $\hat{\beta_{1}}\ \le 0$ vs $H_a$: $\hat{\beta_{1}}\ > 0$. Here, $p$-value is very small (<2$e$-16) compared to 0.01. Therefore, it is statistically significant. We can conclude that here is a positive association between weight and height using the regression coefficient.
+
+### Part D
+``` {r}
+
+confint(model, level = 0.95)
+
+```
+
+\
+\
+\
+Thank you for reviewing.\
+The code below is for the calculation of question 4 and 5.\
+Please refer to the handwritten document.\
+
+
+## Question 4
+
+### Part A
+
+```{r}
+
+n = 30                
+Xba = 41.92
+Yba = 35.83
+Sxx = 2207.45
+Syy = 654.86
+Sxy = 658.37
+
+Beta1_hat <- Sxy / Sxx
+Beta0_hat <- Yba - Xba * Beta1_hat
+
+Beta1_hat
+Beta0_hat
+
+```
+
+### Part B
+
+``` {r}
+
+SSE <- Syy - Beta1_hat * Sxy
+SE_Beta1_hat <- sqrt(SSE / Sxx / (n-2))
+SE_Beta0_hat <- sqrt(1/n + Xba ^ 2 / Sxx) * sqrt(SSE / (n-2))
+
+SE_Beta1_hat
+SE_Beta0_hat
+
+```
+
+### Part C
+
+``` {r}
+
+alpha = 1 - 0.95
+
+CI_left_Beta0_hat <- Beta0_hat - qt(1 - alpha/2, n - 2) * SE_Beta0_hat
+CI_right_Beta0_hat <- Beta0_hat + qt(1 - alpha/2, n - 2) * SE_Beta0_hat
+
+CI_left_Beta1_hat <- Beta1_hat - qt(1 - alpha/2, n - 2) * SE_Beta1_hat
+CI_right_Beta1_hat <- Beta1_hat + qt(1 - alpha/2, n - 2) * SE_Beta1_hat
+
+CI_left_Beta0_hat
+CI_right_Beta0_hat
+
+CI_left_Beta1_hat
+CI_right_Beta1_hat
+
+```
+
+
+## Question 5
+
+### Part E
+
+```{r}
+
+X = c(7, 12, 4, 14, 25, 30)
+Y = c(128, 213, 75, 250, 446, 540)
+
+XY = sum(X * Y)
+Xsquare = sum(X * X)
+
+Beta1_hat_Q5 = XY / Xsquare
+
+XY
+Xsquare
+Beta1_hat_Q5
+
+Model_Q5 = lm(Y ~ X)
+plot(X,Y, xlab = "X axis", ylab = "Y axis")
+lines(X,Y, lwd = 2, col = "red")
+summary(Model_Q5)
+
+```
+
+
